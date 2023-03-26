@@ -11,30 +11,47 @@
 
 <body>
     <section class="main">
-        <form action="" method="post" id="form-1">
+        <form action="" method="post" id="form-1" class="form">
             <h1 class="heading">Register</h1>
             <div class="form-group">
                 <label for="fullname" class="form-label">Full name</label>
-                <input type="text" id="fullname" class="form-control" placeholder="Vd: Tai do">
-                <span class="form-message">1</span>
+                <input type="text" id="fullname" name="fullname" class="form-control" placeholder="Vd: Tai do">
+                <span class="form-message"></span>
             </div>
             <div class="form-group">
                 <label for="email" class="form-label">Email</label>
-                <input type="email" id="email" class="form-control" placeholder="Vd: email@abc.com">
+                <input type="email" id="email" name="email" class="form-control" placeholder="Vd: email@abc.com">
                 <span class="form-message"></span>
             </div>
             <div class="form-group">
                 <label for="password" class="form-label">Password</label>
-                <input type="password" id="password" class="form-control" placeholder="Input password">
+                <input type="password" id="password" name="password" class="form-control" placeholder="Input password">
                 <span class="form-message"></span>
             </div>
             <div class="form-group">
                 <label for="password-confirmation" class="form-label">Confirm password</label>
-                <input type="password" id="password-confirmation" class="form-control" placeholder="Confirm password">
+                <input type="password" id="password-confirmation" name="password-confirmation" class="form-control" placeholder="Confirm password">
                 <span class="form-message"></span>
             </div>
 
             <button class="btn-submit">Register</button>
+        </form>
+        <form action="" method="post" id="form-2" class="form">
+            <h1 class="heading">Login</h1>
+            
+            <div class="form-group">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" id="email" name="email" class="form-control" placeholder="Vd: email@abc.com">
+                <span class="form-message"></span>
+            </div>
+            <div class="form-group">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" id="password" name="password" class="form-control" placeholder="Input password">
+                <span class="form-message"></span>
+            </div>
+            
+
+            <button class="btn-submit">Login</button>
         </form>
 
     </section>
@@ -43,8 +60,9 @@
         //Mong muốn
         validator({
             form: '#form-1',
+            formInput: 'form input',
             formMessage: '.form-message',
-            formGroupSelector: '#form-group',
+            formGroupSelector: '.form-group',
             rules: [
                 validator.isRequired('#fullname'),
                 validator.isRequired('#email'),
@@ -56,7 +74,28 @@
                     return document.querySelector('#password').value;
                 })
 
-            ]
+            ],
+            onSubmit: function(data) {
+                //Call API
+                console.log(data);
+            }
+        })
+        validator({
+            form: '#form-2',
+            formInput: 'form input',
+            formMessage: '.form-message',
+            formGroupSelector: '.form-group',
+            rules: [
+                validator.isRequired('#email'),
+                validator.isEmail('#email'),
+                validator.isRequired('#password'),
+                validator.minLength('#password', 6),
+
+            ],
+            onSubmit: function(data) {
+                //Call API
+                console.log(data);
+            }
         })
     </script>
 </body>

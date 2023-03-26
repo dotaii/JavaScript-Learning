@@ -1,33 +1,102 @@
 function validator(options) {
 
-    //xu ly viec ghi de rule
-    //luu lai cac rules
-    var selectorRules = {};
+    function getParent(element, selector) {
+        while (element.parentElement) {
+            element = element.parentElement;
+            if (element && element.matches(selector)) {
+                return element;
+            }
+        }
+        return null; // Nếu không tìm thấy phần tử cha thoả mãn selector
+    }
+   
 
-    function validateI(inputEl, rule) {
+
+    var selectorRules = {}; // lưu các rule vào Oject để tránh việc ghi đè rule
+
+    //Hàm xử lí lỗi khi chưa có value cho input hoặc value không hợp lệ
+    function validate(inputEl, rule) {
         var errorMessage;
-        var errorEl = inputEl.parentElement.querySelector(options.formMessage)
+        var errorEl = getParent(inputEl, options.formGroupSelector).querySelector(options.formMessage)
 
         var rules = selectorRules[rule.selector]
-        for (var i in rules) {
-            errorMessage = rules[i](inputEl.value);
-            if (errorMessage) break;
+
+        for (var i=0; i < rules.length; i++) {
+            switch (inputEl.type) {
+                case 'radio':
+                case 'checkbox':
+                    errorMessage = rules[i](formEl.querySelector(rule.selector + ':checked'))
+                    break;
+                default:
+                    errorMessage = rules[i](inputEl.value);
+            }
+            if (errorMessage) {
+                break;
+            }
         }
 
+
         if (errorMessage) {
-            inputEl.parentElement.classList.add('invalid');
+            getParent(inputEl, options.formGroupSelector).classList.add('invalid');
             errorEl.innerText = errorMessage;
         } else {
-            inputEl.parentElement.classList.remove('invalid');
+            getParent(inputEl, options.formGroupSelector).classList.remove('invalid');
             errorEl.innerText = '';
         }
+
+        return !errorMessage;
     }
 
     var formEl = document.querySelector(options.form);
-
     if (formEl) {
         formEl.addEventListener('submit', function(e) {
-            e.preventDefault();
+            e.preventDefault(); // Ngăn chặn sự kiện submit chuyển hướng
+
+            var isFormValid = true;
+
+            options.rules.forEach(function(rule) {
+                var inputEl = formEl.querySelector(rule.selector)
+                var isValid = validate(inputEl, rule);
+
+                if (!isValid) {
+                    isFormValid = false;
+                }
+            });
+            if (isFormValid) {
+                if (typeof options.onSubmit === 'function') {
+                    var enableInputs = formEl.querySelectorAll('[name]');
+                    var formValues = Array.from(enableInputs).reduce(function(values, input) {
+                        switch (input.type) {
+                            case 'radio':
+                                if (input.checked) {
+                                    values[input.name] = input.value
+                                }
+                                break;
+                                case 'checkbox':
+                                    if(!input.checked){                                       
+                                        values[input.name] = "";
+                                        return values;
+                                    }
+                                    if(!Array.isArray(values[input.name])){
+                                        values[input.name] = []
+                                    }
+                                    values[input.name].push(input.value)
+                                    break;
+                                case 'file':
+                                    values[input.name] = input.files;
+                                    console.log(values[input.name]);
+                                    break;
+                                        
+                                default:
+                                    values[input.name] = input.value;
+                        }
+                        return values;
+                    }, {})
+                    options.onSubmit(formValues);
+                } else {
+                    formEl.submit();
+                }
+            }
         })
 
 
@@ -42,12 +111,12 @@ function validator(options) {
             var inputEl = formEl.querySelector(rule.selector)
 
             if (inputEl) {
-                var errorEl = inputEl.parentElement.querySelector(options.formMessage)
+                var errorEl = getParent(inputEl, options.formGroupSelector).querySelector(options.formMessage)
                 inputEl.addEventListener('blur', function(e) {
-                    validateI(inputEl, rule);
+                    validate(inputEl, rule);
                 })
                 inputEl.addEventListener('input', function(e) {
-                    inputEl.parentElement.classList.remove('invalid');
+                    getParent(inputEl, options.formGroupSelector).classList.remove('invalid');
                     errorEl.innerText = '';
                 })
             }
@@ -58,12 +127,15 @@ function validator(options) {
 
 
 }
+validator.onSubmit = function() {
+
+}
 
 validator.isRequired = function(selector) {
     return {
         selector: selector,
         test: function(value) {
-            return value.trim() ? undefined : 'Vui long nhap truong nay';
+            return value ? undefined : 'Vui long nhap truong nay';
         }
     };
 }
