@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registry</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <section class="main">
+        <form action="" method="post" id="registry-form" class="form">
+            <h1 class="heading">Register</h1>
+            <div class="form-group">
+                <label for="fullname" class="form-label">Full name</label>
+                <input type="text" id="fullname" name="fullname" rules="required" class="form-control" placeholder="Vd: Tai do">
+                <span class="form-message"></span>
+            </div>
+            <div class="form-group">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" id="email" name="email" rules="required|email" class="form-control" placeholder="Vd: email@abc.com">
+                <span class="form-message"></span>
+            </div>
+            <div class="form-group">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" id="password" name="password" rules="required|min:6" class="form-control" placeholder="Input password">
+                <span class="form-message"></span>
+            </div>
+            
+
+            <button class="btn-submit">Register</button>
+        </form>
+        
+    </section>
+    <script src="validator.js"></script>
+    <script>
+        //Mong muốn / thành quả đạt được ==> output là gì ?
+        var form = new Validator('#registry-form')
+        form.onSubmit = function(formData){
+            console.log(formData);
+        }
+    </script>
+</body>
+
+</html>
